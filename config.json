@@ -2,8 +2,7 @@
   "base_currency": "USD",
   "holdings": [
     {"ticker": "BTC", "type": "crypto"},
-    {"ticker": "ETH", "type": "crypto"},
-    {"ticker": "SOL", "type": "crypto"}
+    {"ticker": "ETH", "type": "crypto"}
   ],
   "market_watch": [
     "S&P 500",
