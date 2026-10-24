@@ -4,6 +4,7 @@ import requests
 from datetime import datetime, timedelta
 from os import getenv
 import mock_response
+from prompts import build_prompt
 
 
 API_KEY = getenv("CMC_API_KEY")
@@ -18,8 +19,9 @@ with PORTFOLIO_PATH.open(encoding="utf-8") as portfolio_file:
     portfolio = json.load(portfolio_file)
 
     symbols = []
-    for ticker in portfolio["holdings"]:
-        symbols.append(ticker["ticker"])
+    for holding in portfolio["holdings"]:
+        if holding.get("type", "").lower() in {"crypto", "cryptocurrency"}:
+            symbols.append(holding["ticker"])
 
     today = datetime.now()
     seven_days_ago = today - timedelta(days=7)
@@ -27,7 +29,11 @@ with PORTFOLIO_PATH.open(encoding="utf-8") as portfolio_file:
     today_str = today.strftime("%Y-%m-%d")
     seven_days_ago_str = seven_days_ago.strftime("%Y-%m-%d")
 
-    weekly_data = [mock_response.btc_week_json, mock_response.eth_week_json]
+    mock_data = {
+        "BTC": mock_response.btc_week_json,
+        "ETH": mock_response.eth_week_json,
+    }
+    weekly_data = []
 
     for symbol in symbols:
         params = {
@@ -35,19 +41,17 @@ with PORTFOLIO_PATH.open(encoding="utf-8") as portfolio_file:
             "time_start": f"{seven_days_ago_str}",
             "time_end": f"{today_str}",
             "interval": "daily",
-            "convert": "USD",
+            "convert": portfolio.get("base_currency", "USD"),
         }
 
-        # response = requests.get(
-        #     URL, headers=headers, params=params, timeout=30
-        # )
-        # response.raise_for_status()
-        # weekly_data.append(response.json())
+        if symbol in mock_data:
+            weekly_data.append(mock_data[symbol])
+        else:
+            pass
+            # response = requests.get(URL, headers=headers, params=params, timeout=30)
+            # response.raise_for_status()
+            # weekly_data.append(response.json())
 
-
-    for coin_week_data in weekly_data:
-        quotes = coin_week_data["data"]["quotes"]
-        print(quotes)
 
 if __name__ == '__main__':
-    pass
+    print(build_prompt(portfolio, weekly_data))
