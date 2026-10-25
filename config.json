@@ -2,11 +2,11 @@
   "base_currency": "USD",
   "holdings": [
     {"ticker": "BTC", "type": "crypto"},
-    {"ticker": "ETH", "type": "crypto"}
+    {"ticker": "ETH", "type": "crypto"},
+    {"ticker": "COI1029", "type": "polish bonds"}
+
   ],
   "market_watch": [
-    "S&P 500",
-    "Nasdaq-100",
-    "USD/PLN"
+    "S&P 500"
   ]
 }
