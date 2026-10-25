@@ -11,6 +11,7 @@ CMC_API_KEY = getenv("CMC_API_KEY")
 PORTFOLIO_PATH = Path(__file__).with_name("config.json")
 CMC_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical"
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
+REPORTS_PATH = Path(__file__).with_name("reports")
 
 def load_weekly_data(config):
     print(f"Loading weekly data for {config}")
@@ -51,7 +52,7 @@ def load_weekly_data(config):
     clean_weekly_data = {}
     for coin_dirty_data in weekly_data_dirty:
         name = coin_dirty_data["data"]["symbol"]
-        last_quote = coin_dirty_data["data"]["quotes"][0]["quote"]["USD"]
+        last_quote = coin_dirty_data["data"]["quotes"][-1]["quote"]["USD"]
         clean_weekly_data[name] = {
             "price": last_quote["price"],
             "percent_change_7d": last_quote["percent_change_7d"],
@@ -98,4 +99,8 @@ if __name__ == '__main__':
         config = json.load(portfolio_file)
     crypto_data = load_weekly_data(config)
     prompt = get_prompt(config, crypto_data)
-    print(run_claude(prompt))
+    report = run_claude(prompt)
+    REPORTS_PATH.mkdir(parents=True, exist_ok=True)
+    report_path = REPORTS_PATH / f"weekly_report_{datetime.now():%Y-%m-%d}.md"
+    report_path.write_text(report.rstrip() + "\n", encoding="utf-8")
+    print(f"Report saved to {report_path}")
