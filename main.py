@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import requests
 from datetime import datetime, timedelta
@@ -6,6 +7,7 @@ from os import getenv
 import mock_response
 from prompts import get_prompt
 import anthropic
+from email_notification import send_report
 
 CMC_API_KEY = getenv("CMC_API_KEY")
 PORTFOLIO_PATH = Path(__file__).with_name("config.json")
@@ -104,3 +106,4 @@ if __name__ == '__main__':
     report_path = REPORTS_PATH / f"weekly_report_{datetime.now():%Y-%m-%d}.md"
     report_path.write_text(report.rstrip() + "\n", encoding="utf-8")
     print(f"Report saved to {report_path}")
+    send_report(Path("reports/weekly_report_2026-10-25.md"), str(os.getenv("GMAIL_EMAIL")))

@@ -4,9 +4,5 @@
     {"ticker": "BTC", "type": "crypto"},
     {"ticker": "ETH", "type": "crypto"},
     {"ticker": "COI1029", "type": "polish bonds"}
-
-  ],
-  "market_watch": [
-    "S&P 500"
   ]
 }
