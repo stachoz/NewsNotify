@@ -2,6 +2,10 @@
 
 This is a simple automation for preparing a weekly market research report for the holdings in `config.json`. It uses CoinMarketCap for cryptocurrency prices and Claude with web search to write a short report in polish. The report is saved in `reports/`.
 
+## Project inspiration
+
+The project was inspired by the automation feature in Perplexity, which requires a paid subscription. This tool generated its most recent report for $0.09 in API usage.
+
 ## Requirements
 
 - Python 3.9 or newer
