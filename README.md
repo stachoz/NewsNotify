@@ -7,7 +7,7 @@ This is a simple automation for preparing a weekly market research report for th
 - Python 3.9 or newer
 - Python packages listed in `requirements.txt`
 - An Anthropic API key, set as `ANTHROPIC_API_KEY`
-- A CoinMarketCap API key, set as `CMC_API_KEY`, if you add crypto tickers other than BTC and ETH (those two currently use sample data in `mock_response.py`)
+- A CoinMarketCap API key, set as `CMC_API_KEY` 
 - A Gmail account with an app password, if you want the generated report emailed
 
 Install the packages with:
