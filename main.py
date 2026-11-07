@@ -1,6 +1,7 @@
 import json
 import os
 from datetime import datetime, timedelta
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -8,7 +9,7 @@ import anthropic
 import requests
 
 from email_notification import send_report
-from prompts import get_weekly_prompt
+from prompts import get_weekly_prompt, get_kobeisii_letter_summarization_prompt
 
 PORTFOLIO_PATH = Path(__file__).with_name("config.json")
 CMC_URL = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/historical"
@@ -28,6 +29,11 @@ CLAUDE_TOOLS = [
         },
     }
 ]
+
+
+class ReportType(Enum):
+    WEEKLY = "weekly"
+    KOBEISII = "kobeisii"
 
 
 def _fetch_symbol_data(symbol: str, params: dict[str, str]) -> dict[str, Any]:
@@ -114,22 +120,28 @@ def load_config(file_path: Path) -> dict[str, Any]:
         return json.load(config_file)
 
 
-def save_report(report: str, output_dir: Path) -> Path:
+def save_report(report: str, output_dir: Path, report_type: ReportType) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
-    report_path = output_dir / f"weekly_report_{datetime.now():%Y-%m-%d}.md"
+    report_path = output_dir / f"{report_type.value}_report_{datetime.now():%Y-%m-%d}.md"
     report_path.write_text(report.rstrip() + "\n", encoding="utf-8")
     print(f"Report saved to {report_path}")
     return report_path
 
 
 def main() -> None:
+    receiver_email = os.getenv("GMAIL_EMAIL", "")
+
     config = load_config(PORTFOLIO_PATH)
     crypto_data = load_weekly_data(config)
     prompt = get_weekly_prompt(config, crypto_data)
     report = run_claude(prompt)
-    report_path = save_report(report, REPORTS_PATH)
-    receiver_email = os.getenv("GMAIL_EMAIL", "")
+    report_path = save_report(report, REPORTS_PATH, ReportType.WEEKLY)
     send_report(report_path, receiver_email)
+
+    kobesii_summarization_prompt = get_kobeisii_letter_summarization_prompt()
+    kobesii_raport = run_claude(kobesii_summarization_prompt)
+    kobesii_report_path = save_report(kobesii_raport, REPORTS_PATH, ReportType.KOBEISII)
+    send_report(kobesii_report_path, receiver_email)
 
 
 if __name__ == "__main__":
